@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrueRange Labs — Translate Lab Reports Into Optimal Health Ranges</title>
+  <meta name="description" content="Upload any blood test PDF or lab photo. TrueRange Labs translates clinical lab ranges into plain-English optimal longevity targets." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #0f172a; background-color: #ffffff; }
+    .emerald-glow { box-shadow: 0 18px 40px -15px rgba(5, 150, 105, 0.22); }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+  <!-- Sticky Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <svg class="w-8 h-8 text-emerald-600 transition-transform group-hover:scale-105" viewBox="0 0 36 36" fill="none">
+          <rect x="2" y="2" width="32" height="32" rx="9" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
+          <path d="M12 10H9.5C8.67 10 8 10.67 8 11.5V24.5C8 25.33 8.67 26 9.5 26H12" stroke="#059669" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M24 10H26.5C27.33 10 28 10.67 28 11.5V24.5C28 25.33 27.33 26 26.5 26H24" stroke="#059669" stroke-width="2.4" stroke-linecap="round"/>
+          <line x1="12" y1="18" x2="24" y2="18" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="3.5" fill="#047857"/>
+        </svg>
+        <span class="font-bold text-lg tracking-tight text-slate-900">TrueRange <span class="text-emerald-600">Labs</span></span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+        <a href="#how-it-works" class="hover:text-emerald-700 transition">How It Works</a>
+        <a href="#compare" class="hover:text-emerald-700 transition">Normal vs. Optimal</a>
+        <a href="#pricing" class="hover:text-emerald-700 transition">Pricing</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <span id="userBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"></span>
+        <button id="authNavBtn" onclick="openAuthModal()" class="text-sm font-semibold text-slate-700 hover:text-emerald-700 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition">
+          Log in
+        </button>
+        <a href="#upload" class="text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
+          Analyze Lab
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero + Live AI Dropzone -->
+  <section id="upload" class="pt-12 pb-16 sm:pt-16 sm:pb-20 bg-gradient-to-b from-slate-50 via-white to-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        No Blood Draws Required — Works With Any Existing Lab PDF or Photo
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+        “Normal” Lab Results Aren’t Always <span class="text-emerald-600">Optimal.</span>
+      </h1>
+      <p class="mt-4 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        Upload your Quest, LabCorp, LifeLabs, or hospital PDF or smartphone photo. Our AI translates complex biomarkers into clear, optimal longevity ranges in seconds.
+      </p>
+
+      <!-- Interactive Dropzone Card -->
+      <div class="mt-9 max-w-2xl mx-auto bg-white rounded-2xl border-2 border-dashed border-emerald-300 hover:border-emerald-500 p-6 sm:p-8 emerald-glow transition">
+        <input type="file" id="labFileInput" accept=".pdf,image/*" class="hidden" onchange="handleFileUpload(event)" />
+
+        <div id="dropzoneIdle" class="flex flex-col items-center">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+          </div>
+          <h2 class="text-lg font-bold text-slate-900">Upload Your Lab Report (PDF or Photo)</h2>
+          <p class="text-sm text-slate-500 mt-1">Supports PDF, JPG, PNG, or HEIC up to 10 MB • First report free</p>
+
+          <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="triggerFileSelect()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm transition">
+              Select Lab PDF or Photo
+            </button>
+            <button onclick="runSampleDemo()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm px-4 py-2.5 rounded-xl transition">
+              Try Sample Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="dropzoneLoading" class="hidden py-6 flex flex-col items-center">
+          <div class="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3"></div>
+          <p id="loadingStatusText" class="text-sm font-semibold text-slate-800">Extracting biomarkers & comparing against optimal longevity targets...</p>
+          <p class="text-xs text-slate-500 mt-1">Usually takes 5–10 seconds</p>
+        </div>
+
+        <!-- Error / Upgrade Prompt -->
+        <div id="dropzoneError" class="hidden mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-left">
+          <p id="errorMessageText" class="text-sm font-medium text-amber-900"></p>
+          <div class="mt-3 flex gap-3">
+            <a href="#pricing" class="text-xs font-bold bg-emerald-600 text-white px-3.5 py-2 rounded-lg hover:bg-emerald-700">Unlock Unlimited ($19/mo)</a>
+            <button onclick="resetDropzone()" class="text-xs font-semibold text-slate-600 hover:text-slate-900">Dismiss</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Parsed Results Container -->
+      <div id="resultsContainer" class="hidden mt-8 max-w-3xl mx-auto text-left bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-7">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">TrueRange Biomarker Breakdown</span>
+            <h3 id="resultFileName" class="text-lg font-bold text-slate-900 mt-0.5">Lab Analysis</h3>
+          </div>
+          <button onclick="resetDropzone()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">
+            Upload Another Report
+          </button>
+        </div>
+
+        <p id="resultSummary" class="mt-4 text-sm text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 leading-relaxed"></p>
+        <div id="biomarkerCards" class="mt-4 space-y-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="py-14 bg-slate-50 border-y border-slate-200/70">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">How TrueRange Labs Works</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Three simple steps to understand what your lab numbers actually mean for energy, metabolism, and longevity.</p>
+      </div>
+      <div class="mt-9 grid sm:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">1</div>
+          <h3 class="font-bold text-slate-900">Upload PDF or Photo</h3>
+          <p class="text-sm text-slate-600 mt-1.5">Snap a clear photo of your printed lab sheet or upload any PDF from your patient portal.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">2</div>
+          <h3 class="font-bold text-slate-900">AI Range Normalization</h3>
+          <p class="text-sm text-slate-600 mt-1.5">Our engine extracts every marker and compares standard disease-screening ranges against optimal targets.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">3</div>
+          <h3 class="font-bold text-slate-900">Plain-English Action Plan</h3>
+          <p class="text-sm text-slate-600 mt-1.5">Get clear explanations and smart follow-up questions to bring to your next doctor visit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Normal vs Optimal Comparison -->
+  <section id="compare" class="py-14 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Standard Lab Range vs. Optimal Target</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Why you can feel exhausted or foggy even when your doctor says “everything looks normal.”</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-bold text-slate-900 text-base">Ferritin</span>
+              <span class="text-xs text-slate-500 ml-2">Iron Stores &amp; Energy</span>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold">
+              <span class="px-2.5 py-1 rounded-md bg-slate-200/80 text-slate-700">Lab: 15 – 150 ng/mL</span>
+              <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 50 – 120 ng/mL</span>
+            </div>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 leading-relaxed">Levels between 16–35 ng/mL are flagged “normal” even though low iron stores commonly cause low stamina, brain fog, and hair thinning.</p>
+        </div>
+
+        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-bold text-slate-900 text-base">Vitamin D (25-OH)</span>
+              <span class="text-xs text-slate-500 ml-2">Immune &amp; Mood Support</span>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold">
+              <span class="px-2.5 py-1 rounded-md bg-slate-200/80 text-slate-700">Lab: 30 – 100 ng/mL</span>
+              <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 50 – 80 ng/mL</span>
+            </div>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 leading-relaxed">30 ng/mL merely prevents bone softening; longevity clinicians target 50–80 ng/mL for resilient immunity, mood, and hormone balance.</p>
+        </div>
+
+        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-bold text-slate-900 text-base">Fasting Insulin</span>
+              <span class="text-xs text-slate-500 ml-2">Metabolic Health</span>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold">
+              <span class="px-2.5 py-1 rounded-md bg-slate-200/80 text-slate-700">Lab: 2.6 – 24.9 µIU/mL</span>
+              <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 2.0 – 6.0 µIU/mL</span>
+            </div>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 leading-relaxed">Elevated fasting insulin signals early insulin resistance years before fasting glucose or HbA1c ever leave the normal range.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing with PayPal Subscription -->
+  <section id="pricing" class="py-16 bg-slate-50 border-t border-slate-200/80">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Simple, Transparent Pricing</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Try your first lab report free. Upgrade anytime for unlimited uploads.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-stretch">
+        <!-- Free Starter -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-7 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Free Starter</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-slate-900">$0</span>
+              <span class="text-sm text-slate-500">/ one-time test</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">See how TrueRange translates your real lab numbers before subscribing.</p>
+            <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
+              <li>✓ 1 Full AI Lab Report Analysis (PDF or Photo)</li>
+              <li>✓ Standard vs. Optimal Range Comparison</li>
+              <li>✓ Plain-English Biomarker Explanations</li>
+            </ul>
+          </div>
+          <button onclick="openAuthModal()" class="mt-7 w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-emerald-600 text-slate-800 font-semibold text-sm transition">
+            Create Free Account
+          </button>
+        </div>
+
+        <!-- TrueRange Pro ($19/mo) -->
+        <div class="bg-white rounded-2xl border-2 border-emerald-600 p-7 shadow-lg relative flex flex-col justify-between">
+          <div class="absolute -top-3 right-6 bg-emerald-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+            Most Popular
+          </div>
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">TrueRange Pro</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-slate-900">$19</span>
+              <span class="text-sm text-slate-500">USD / month</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Unlimited lab translations for ongoing health tracking and family panels.</p>
+            <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
+              <li>✓ Unlimited PDF &amp; Photo Lab Uploads</li>
+              <li>✓ Full Longevity &amp; Functional Range Targets</li>
+              <li>✓ Doctor Visit Question Generator</li>
+              <li>✓ Cancel anytime in 1 click via PayPal</li>
+            </ul>
+          </div>
+
+          <div class="mt-6">
+            <div id="paypalNotice" class="hidden mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-900"></div>
+            <div class="max-w-[260px] mx-auto">
+              <div id="paypal-button-container-P-67A60544K5870822LNL4VK5I"></div>
+            </div>
+            <p class="text-center text-xs text-slate-400 mt-2">Billed at $19 USD/month via PayPal. Cancel anytime.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 bg-white border-t border-slate-200 text-center text-xs text-slate-500 px-4">
+    <p class="max-w-2xl mx-auto leading-relaxed">
+      <strong>Medical Disclaimer:</strong> TrueRange Labs provides educational biomarker translations and functional wellness ranges only. It is not a medical device and does not diagnose, treat, or replace professional medical advice. Always review lab results with a licensed physician.
+    </p>
+    <p class="mt-4 text-slate-400">&copy; 2026 TrueRange Labs (TrueRangeLabs.com). All rights reserved.</p>
+  </footer>
+
+  <!-- Auth Modal (Sign Up / Log In) -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-200 relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+      <h3 class="text-xl font-bold text-slate-900">Sign In or Create Free Account</h3>
+      <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your Pro subscription.</p>
+
+      <form onsubmit="handleAuthSubmit(event)" class="mt-5 space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password (min 6 characters)</label>
+          <input type="password" id="authPassword" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+        </div>
+        <p id="authFeedback" class="text-xs font-medium text-emerald-700"></p>
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <button type="submit" data-mode="login" onclick="window._authMode='login'" class="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition">
+            Log In
+          </button>
+          <button type="submit" data-mode="signup" onclick="window._authMode='signup'" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
+            Sign Up Free
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PayPal Subscription SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA6dA1hLyBaD4BV524HwYtNYicUHE0z2UK1zwzNZxz9mskQU25j-rspto6gae6fEc_eb_r6jV5Ds0efR4&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://nrwhpxkwxgdsiwbvplsx.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_uRIk-UMJ6JlaGbaJc2Cjig_MsKcZYWS';
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentSession = null;
+
+    async function refreshSession() {
+      const { data } = await sb.auth.getSession();
+      currentSession = data.session;
+      const authBtn = document.getElementById('authNavBtn');
+      const userBadge = document.getElementById('userBadge');
+
+      if (currentSession?.user) {
+        userBadge.textContent = currentSession.user.email;
+        userBadge.classList.remove('hidden');
+        authBtn.textContent = 'Log out';
+        authBtn.onclick = async () => {
+          await sb.auth.signOut();
+          refreshSession();
+        };
+      } else {
+        userBadge.classList.add('hidden');
+        authBtn.textContent = 'Log in';
+        authBtn.onclick = openAuthModal;
+      }
+    }
+    refreshSession();
+
+    function openAuthModal() {
+      document.getElementById('authFeedback').textContent = '';
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const feedback = document.getElementById('authFeedback');
+      feedback.className = 'text-xs font-medium text-slate-600';
+      feedback.textContent = 'Please wait...';
+
+      if (window._authMode === 'signup') {
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if (error) {
+          feedback.className = 'text-xs font-medium text-red-600';
+          feedback.textContent = error.message;
+        } else {
+          feedback.className = 'text-xs font-medium text-emerald-700';
+          feedback.textContent = data.session ? 'Account created! You are logged in.' : 'Check your email to confirm your account, then log in.';
+          await refreshSession();
+          if (data.session) setTimeout(closeAuthModal, 900);
+        }
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) {
+          feedback.className = 'text-xs font-medium text-red-600';
+          feedback.textContent = error.message;
+        } else {
+          feedback.className = 'text-xs font-medium text-emerald-700';
+          feedback.textContent = 'Logged in!';
+          await refreshSession();
+          setTimeout(closeAuthModal, 700);
+        }
+      }
+    }
+
+    function triggerFileSelect() {
+      if (!currentSession) {
+        openAuthModal();
+        return;
+      }
+      document.getElementById('labFileInput').click();
+    }
+
+    function resetDropzone() {
+      document.getElementById('dropzoneIdle').classList.remove('hidden');
+      document.getElementById('dropzoneLoading').classList.add('hidden');
+      document.getElementById('dropzoneError').classList.add('hidden');
+      document.getElementById('resultsContainer').classList.add('hidden');
+      document.getElementById('labFileInput').value = '';
+    }
+
+    async function handleFileUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (!currentSession) {
+        openAuthModal();
+        return;
+      }
+
+      document.getElementById('dropzoneIdle').classList.add('hidden');
+      document.getElementById('dropzoneError').classList.add('hidden');
+      document.getElementById('resultsContainer').classList.add('hidden');
+      document.getElementById('dropzoneLoading').classList.remove('hidden');
+
+      try {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentSession.access_token}`
+          },
+          body: JSON.stringify({
+            fileBase64: base64,
+            mimeType: file.type || 'application/pdf',
+            fileName: file.name
+          })
+        });
+
+        const data = await res.json();
+        document.getElementById('dropzoneLoading').classList.add('hidden');
+
+        if (!res.ok) {
+          document.getElementById('dropzoneIdle').classList.remove('hidden');
+          document.getElementById('errorMessageText').textContent = data.error || 'Could not process lab report.';
+          document.getElementById('dropzoneError').classList.remove('hidden');
+          return;
+        }
+
+        renderResults(file.name, data);
+      } catch (err) {
+        document.getElementById('dropzoneLoading').classList.add('hidden');
+        document.getElementById('dropzoneIdle').classList.remove('hidden');
+        document.getElementById('errorMessageText').textContent = 'Network error uploading file. Please try again.';
+        document.getElementById('dropzoneError').classList.remove('hidden');
+      }
+    }
+
+    function renderResults(title, data) {
+      document.getElementById('resultFileName').textContent = title;
+      document.getElementById('resultSummary').textContent = data.summary || '';
+      const container = document.getElementById('biomarkerCards');
+      container.innerHTML = '';
+
+      (data.biomarkers || []).forEach(b => {
+        const badgeColor = b.status === 'Optimal'
+          ? 'bg-emerald-100 text-emerald-800'
+          : b.status === 'Suboptimal'
+          ? 'bg-amber-100 text-amber-800'
+          : 'bg-rose-100 text-rose-800';
+
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl border border-slate-200 bg-slate-50/50';
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-bold text-slate-900">${b.name}</span>
+              <span class="text-xs text-slate-500 ml-2">${b.category || ''}</span>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${badgeColor}">${b.status} • ${b.value}</span>
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+            <span class="px-2 py-0.5 rounded bg-slate-200/80 text-slate-700">Lab Range: ${b.standardRange}</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Optimal Target: ${b.optimalRange}</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 leading-relaxed">${b.explanation}</p>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('resultsContainer').classList.remove('hidden');
+    }
+
+    function runSampleDemo() {
+      document.getElementById('dropzoneIdle').classList.add('hidden');
+      renderResults('Sample Comprehensive Panel (Demo)', {
+        summary: '3 of 4 markers fall inside standard hospital ranges, yet Ferritin and Vitamin D sit below optimal longevity targets for energy and immune resilience.',
+        biomarkers: [
+          {
+            name: 'Ferritin',
+            category: 'Iron Stores & Energy',
+            value: '26 ng/mL',
+            standardRange: '15 – 150 ng/mL',
+            optimalRange: '50 – 120 ng/mL',
+            status: 'Suboptimal',
+            explanation: 'While technically above the 15 ng/mL deficiency cutoff, ferritin below 50 ng/mL frequently contributes to fatigue and low exercise stamina.'
+          },
+          {
+            name: 'Vitamin D (25-OH)',
+            category: 'Immune & Mood Support',
+            value: '34 ng/mL',
+            standardRange: '30 – 100 ng/mL',
+            optimalRange: '50 – 80 ng/mL',
+            status: 'Suboptimal',
+            explanation: 'Just above the minimum sufficiency threshold. Raising levels into the 50–80 ng/mL range supports stronger immune and metabolic function.'
+          },
+          {
+            name: 'hs-CRP',
+            category: 'Cardiovascular Inflammation',
+            value: '0.6 mg/L',
+            standardRange: '0.0 – 3.0 mg/L',
+            optimalRange: '< 1.0 mg/L',
+            status: 'Optimal',
+            explanation: 'Excellent low systemic inflammation marker, well within the optimal cardiovascular longevity target.'
+          }
+        ]
+      });
+    }
+
+    if (window.paypal) {
+      paypal.Buttons({
+        style: {
+          shape: 'pill',
+          color: 'blue',
+          layout: 'horizontal',
+          label: 'subscribe',
+          height: 40,
+          tagline: false
+        },
+        createSubscription: function(data, actions) {
+          return actions.subscription.create({
+            plan_id: 'P-67A60544K5870822LNL4VK5I'
+          });
+        },
+        onApprove: async function(data, actions) {
+          const notice = document.getElementById('paypalNotice');
+          notice.classList.remove('hidden');
+
+          if (currentSession) {
+            await fetch('/api/paypal-sync', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentSession.access_token}`
+              },
+              body: JSON.stringify({ subscriptionID: data.subscriptionID })
+            });
+            notice.textContent = 'TrueRange Pro is now unlocked on your account! Subscription ID: ' + data.subscriptionID;
+          } else {
+            notice.textContent = 'Subscription approved (ID: ' + data.subscriptionID + '). Log in or sign up above with your email to link Pro access.';
+          }
+        }
+      }).render('#paypal-button-container-P-67A60544K5870822LNL4VK5I');
+    }
+  </script>
+</body>
+</html>
+
