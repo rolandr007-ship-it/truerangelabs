@@ -1,0 +1,9 @@
+{
+  "name": "truerangelabs",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@google/genai": "^0.3.0",
+    "@supabase/supabase-js": "^2.49.1"
+  }
+}
