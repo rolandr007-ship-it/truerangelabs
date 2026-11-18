@@ -81,7 +81,7 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
   ]
 }`;
 
-        let response;
+    let response;
     const models = ['gemini-3.8-flash', 'gemini-3.8-flash', 'gemini-3.8-flash-lite'];
     for (let i = 0; i < models.length; i++) {
       try {
@@ -90,7 +90,7 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
           contents: [
             {
               inlineData: {
-                data: base64Data,
+                data: fileBase64,
                 mimeType: mimeType
               }
             },
@@ -110,3 +110,23 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
       }
     }
 
+    const cleanText = response.text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleanText);
+
+    if (profile.plan !== 'pro') {
+      await supabaseAdmin
+        .from('profiles')
+        .update({ free_reports_used: (profile.free_reports_used || 0) + 1 })
+        .eq('id', user.id);
+    }
+
+    return res.status(200).json({
+      ...parsed,
+      plan: profile.plan,
+      freeReportsRemaining: profile.plan === 'pro' ? 'Unlimited' : 0
+    });
+  } catch (err) {
+    console.error('Analyze error:', err);
+    return res.status(500).json({ error: 'Failed to parse lab report. Please ensure the PDF or photo is legible and under 10MB.' });
+  }
+}
