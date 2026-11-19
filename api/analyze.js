@@ -81,8 +81,8 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
   ]
 }`;
 
-        let response;
-    const models = ['gemini-3.8-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash-lite'];
+            let response;
+    const models = ['gemini-2.5-flash-lite', 'gemini-3.8-flash-lite', 'gemini-3.8-flash'];
     for (let i = 0; i < models.length; i++) {
       try {
         response = await ai.models.generateContent({
@@ -97,19 +97,20 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
             prompt
           ],
           config: {
-            responseMimeType: 'application/json'
+            responseMimeType: 'application/json',
+            abortSignal: AbortSignal.timeout(25000)
           }
         });
         break;
       } catch (err) {
-        const msg = String(err?.message || '');
-        if ((err?.status === 503 || msg.includes('503') || msg.includes('404')) && i < models.length - 1) {
-          await new Promise((r) => setTimeout(r, 1500));
+        if (i < models.length - 1) {
+          await new Promise((r) => setTimeout(r, 1000));
           continue;
         }
         throw err;
       }
     }
+
         const cleanText = response.text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleanText);
 
