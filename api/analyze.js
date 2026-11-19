@@ -1,19 +1,13 @@
-import { GoogleGenAI } from '@google/genai';
 import { createClient } from '@supabase/supabase-js';
 
 export const config = {
+  maxDuration: 60,
   api: {
     bodyParser: {
       sizeLimit: '12mb'
     }
   }
 };
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,6 +20,16 @@ export default async function handler(req, res) {
     if (!token) {
       return res.status(401).json({ error: 'Please log in or create a free account to analyze your lab report.' });
     }
+
+    const supabaseUrl = process.env.SUPABASE_URL || 'https://nrwhpxkwxgdsiwbvplsx.supabase.co';
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+
+    if (!supabaseServiceKey || !geminiApiKey) {
+      return res.status(500).json({ error: 'Server environment variables are missing in Vercel.' });
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
@@ -42,99 +46,120 @@ export default async function handler(req, res) {
       const { data: inserted } = await supabaseAdmin
         .from('profiles')
         .insert({ id: user.id, email: user.email, plan: 'free', free_reports_used: 0 })
-        .select()
+        .select('*')
         .single();
-      profile = inserted;
+      profile = inserted || { plan: 'free', free_reports_used: 0 };
     }
 
-    if (profile.plan !== 'pro' && profile.free_reports_used >= 1) {
+    if (profile.plan !== 'pro' && (profile.free_reports_used || 0) >= 1) {
       return res.status(403).json({
-        error: 'You have used your 1 free lab report. Upgrade to TrueRange Pro ($19/month) below for unlimited PDF & photo uploads.',
-        upgradeRequired: true
+        error: 'You have used your 1 free lab report. Upgrade to TrueRange Pro ($19/mo) for unlimited analyses.'
       });
     }
 
-    const { fileBase64, mimeType, fileName } = req.body;
-    if (!fileBase64 || !mimeType) {
-      return res.status(400).json({ error: 'Missing lab file data.' });
+    const { fileBase64, mimeType } = req.body || {};
+    if (!fileBase64) {
+      return res.status(400).json({ error: 'No file received. Please select a PDF or photo.' });
     }
 
-    const prompt = `You are a functional longevity & clinical lab biomarker parser for TrueRange Labs.
-Extract all visible lab biomarkers from the attached lab report (${fileName || 'uploaded file'}).
-For each biomarker found, compare the measured value against BOTH:
-1. Standard clinical lab reference range (as shown on the report or standard medical convention)
-2. Functional / Longevity Optimal range (tighter preventative health target)
-
-Return ONLY valid JSON matching this exact structure (no markdown backticks):
+    const prompt = `You are a preventative medicine and clinical biomarker analyst.
+Extract every lab biomarker from the attached lab report.
+Return ONLY valid JSON matching this exact structure (no markdown, no extra text):
 {
-  "summary": "2-sentence plain-English overview of key findings and optimal vs suboptimal markers.",
+  "summary": "2-3 sentence plain-English overview highlighting optimal markers and any suboptimal or out-of-range markers.",
   "biomarkers": [
     {
-      "name": "Biomarker Name (e.g., Ferritin)",
-      "category": "Short System Tag (e.g., Iron Stores & Energy)",
-      "value": "Measured numeric value + unit (e.g., 28 ng/mL)",
-      "standardRange": "Standard lab range (e.g., 15 – 150 ng/mL)",
-      "optimalRange": "Functional optimal range (e.g., 50 – 120 ng/mL)",
-      "status": "Optimal" | "Suboptimal" | "Out of Range",
-      "explanation": "1-2 clear, non-diagnostic sentences explaining what this level means and practical questions to ask a clinician."
+      "name": "Biomarker Name",
+      "category": "Body System (e.g. Metabolic, Thyroid, Iron Stores, Lipids, Vitamins)",
+      "value": "Measured value with unit",
+      "standardRange": "Lab standard reference range",
+      "optimalRange": "Preventative functional longevity target range",
+      "status": "Optimal or Suboptimal or Out of Range",
+      "explanation": "1-2 sentence plain-English explanation of what this result means."
     }
   ]
 }`;
 
-                    const models = [
-      'gemini-3.8-flash',
-      'gemini-3.8-flash-lite',
-      'gemini-2.5-flash-lite',
-      'gemini-3-flash-preview'
-    ];
+    const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+    let parsedResult = null;
+    let lastError = '';
 
-    for (let i = 0; i < models.length; i++) {
+    for (const model of models) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+
       try {
-        response = await ai.models.generateContent({
-          model: models[i],
-          contents: [
-            {
-              inlineData: {
-                data: fileBase64,
-                mimeType: mimeType
+        const geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    {
+                      inlineData: {
+                        mimeType: mimeType || 'application/pdf',
+                        data: fileBase64
+                      }
+                    }
+                  ]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                responseMimeType: 'application/json'
               }
-            },
-            prompt
-          ],
-          config: {
-            responseMimeType: 'application/json',
-            abortSignal: AbortSignal.timeout(25000)
+            })
           }
-        });
-        break;
-      } catch (err) {
-        if (i < models.length - 1) {
-          await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+        );
+
+        clearTimeout(timeoutId);
+
+        if (!geminiResponse.ok) {
+          const errText = await geminiResponse.text();
+          lastError = `${model} (${geminiResponse.status}): ${errText.slice(0, 180)}`;
+          console.error('Gemini model failed:', lastError);
           continue;
         }
-        throw err;
+
+        const geminiJson = await geminiResponse.json();
+        const rawText = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const cleanedJson = rawText.replace(/```json|```/gi, '').trim();
+        parsedResult = JSON.parse(cleanedJson);
+
+        if (parsedResult && Array.isArray(parsedResult.biomarkers)) {
+          break;
+        }
+      } catch (modelErr) {
+        clearTimeout(timeoutId);
+        lastError = `${model}: ${modelErr.message}`;
+        console.error('Gemini exception:', lastError);
       }
     }
 
-
-        const cleanText = response.text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleanText);
+    if (!parsedResult || !Array.isArray(parsedResult.biomarkers)) {
+      return res.status(502).json({
+        error: `Could not parse report (${lastError || 'check file legibility'}).`
+      });
+    }
 
     if (profile.plan !== 'pro') {
       await supabaseAdmin
         .from('profiles')
-        .update({ free_reports_used: (profile.free_reports_used || 0) + 1 })
+        .update({
+          free_reports_used: (profile.free_reports_used || 0) + 1,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id);
     }
 
-    return res.status(200).json({
-      ...parsed,
-      plan: profile.plan,
-      freeReportsRemaining: profile.plan === 'pro' ? 'Unlimited' : 0
-    });
+    return res.status(200).json(parsedResult);
   } catch (err) {
     console.error('Analyze error:', err);
-    return res.status(500).json({ error: 'Failed to parse lab report. Please ensure the PDF or photo is legible and under 10MB.' });
+    return res.status(500).json({ error: 'Server error analyzing report: ' + err.message });
   }
 }
-
