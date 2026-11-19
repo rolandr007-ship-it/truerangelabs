@@ -120,7 +120,7 @@
             </svg>
           </div>
           <h2 class="text-lg sm:text-xl font-bold text-slate-900">Upload Your Lab Report (PDF or Photo)</h2>
-          <p class="text-sm text-slate-500 mt-1">Supports multi-page PDF, JPG, PNG, or HEIC up to 10 MB • First full report free</p>
+          <p class="text-sm text-slate-500 mt-1">Supports PDF up to 3.2 MB or any smartphone photo • First full report free</p>
 
           <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button onclick="triggerFileSelect()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-sm transition">
@@ -398,7 +398,7 @@
             <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
           </summary>
           <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-            You can upload downloaded PDFs or clear smartphone photos (JPG, PNG, HEIC up to 10 MB) from Quest Diagnostics, LabCorp, LifeLabs, Dynacare, hospital patient portals, or international labs.
+            You can upload downloaded PDFs (up to 3.2 MB) or clear smartphone photos (JPG, PNG, HEIC—automatically optimized on upload) from Quest Diagnostics, LabCorp, LifeLabs, Dynacare, hospital patient portals, or international labs.
           </p>
         </details>
 
@@ -680,12 +680,68 @@
       document.getElementById('labFileInput').value = '';
     }
 
+    async function compressImageIfNeeded(file) {
+      if (!file.type.startsWith('image/')) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({
+            base64: reader.result.split(',')[1],
+            mimeType: file.type || 'application/pdf'
+          });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const maxDim = 1800;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          resolve({
+            base64: dataUrl.split(',')[1],
+            mimeType: 'image/jpeg'
+          });
+        };
+        img.onerror = (e) => {
+          URL.revokeObjectURL(url);
+          reject(e);
+        };
+        img.src = url;
+      });
+    }
+
     async function handleFileUpload(event) {
       const file = event.target.files?.[0];
       if (!file) return;
 
       if (!currentSession) {
         openAuthModal();
+        return;
+      }
+
+      if (file.type === 'application/pdf' && file.size > 3.2 * 1024 * 1024) {
+        document.getElementById('errorMessageText').textContent =
+          `This PDF is ${(file.size / (1024 * 1024)).toFixed(1)} MB. Please upload a PDF under 3.2 MB or take screenshots of your lab pages (photos are auto-compressed).`;
+        document.getElementById('dropzoneError').classList.remove('hidden');
+        document.getElementById('labFileInput').value = '';
         return;
       }
 
@@ -696,12 +752,7 @@
       startUploadProgress();
 
       try {
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+        const prepared = await compressImageIfNeeded(file);
 
         const res = await fetch('/api/analyze', {
           method: 'POST',
@@ -710,13 +761,24 @@
             'Authorization': `Bearer ${currentSession.access_token}`
           },
           body: JSON.stringify({
-            fileBase64: base64,
-            mimeType: file.type || 'application/pdf',
+            fileBase64: prepared.base64,
+            mimeType: prepared.mimeType,
             fileName: file.name
           })
         });
 
-        const data = await res.json();
+        const rawText = await res.text();
+        let data = {};
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          data = {
+            error: res.status === 413
+              ? 'File is too large for the server (over 4.5 MB). Please upload a smaller PDF or screenshot.'
+              : `Server returned HTTP ${res.status}. Please try again.`
+          };
+        }
+
         stopUploadProgress();
         document.getElementById('dropzoneLoading').classList.add('hidden');
 
@@ -732,7 +794,7 @@
         stopUploadProgress();
         document.getElementById('dropzoneLoading').classList.add('hidden');
         document.getElementById('dropzoneIdle').classList.remove('hidden');
-        document.getElementById('errorMessageText').textContent = 'Network error uploading file. Please try again.';
+        document.getElementById('errorMessageText').textContent = 'Connection interrupted: ' + (err.message || 'Please check your internet and try again.');
         document.getElementById('dropzoneError').classList.remove('hidden');
       }
     }
