@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TrueRange Labs — Translate Lab Reports Into Optimal Health Ranges</title>
-  <meta name="description" content="Upload any blood test PDF or lab photo. TrueRange Labs translates clinical lab ranges into plain-English optimal longevity targets." />
+  <title>TrueRange Labs — Precision Biomarker &amp; Longevity Intelligence</title>
+  <meta name="description" content="Upload any blood test PDF or lab photo. TrueRange Labs translates clinical lab ranges into plain-English optimal longevity targets in 15–45 seconds." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +12,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #0f172a; background-color: #ffffff; }
-    .emerald-glow { box-shadow: 0 18px 40px -15px rgba(5, 150, 105, 0.22); }
+    .emerald-glow { box-shadow: 0 24px 60px -15px rgba(5, 150, 105, 0.22); }
+    .hero-grid {
+      background-image: radial-gradient(rgba(16, 185, 129, 0.14) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #resultsContainer, #resultsContainer * { visibility: visible; }
+      #resultsContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-emerald-100 selection:text-emerald-900">
@@ -28,17 +52,22 @@
           <line x1="12" y1="18" x2="24" y2="18" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/>
           <circle cx="18" cy="18" r="3.5" fill="#047857"/>
         </svg>
-        <span class="font-bold text-lg tracking-tight text-slate-900">TrueRange <span class="text-emerald-600">Labs</span></span>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-lg tracking-tight text-slate-900">TrueRange <span class="text-emerald-600">Labs</span></span>
+          <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-900 text-emerald-300">AI Health</span>
+        </div>
       </a>
 
-      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+      <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
         <a href="#how-it-works" class="hover:text-emerald-700 transition">How It Works</a>
         <a href="#compare" class="hover:text-emerald-700 transition">Normal vs. Optimal</a>
         <a href="#pricing" class="hover:text-emerald-700 transition">Pricing</a>
+        <a href="#faq" class="hover:text-emerald-700 transition">FAQ</a>
+        <a href="#investors" class="hover:text-emerald-700 transition">Investors</a>
       </nav>
 
-      <div class="flex items-center gap-3">
-        <span id="userBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"></span>
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <span id="userBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 max-w-[140px] truncate"></span>
         <button id="authNavBtn" onclick="openAuthModal()" class="text-sm font-semibold text-slate-700 hover:text-emerald-700 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition">
           Log in
         </button>
@@ -50,47 +79,80 @@
   </header>
 
   <!-- Hero + Live AI Dropzone -->
-  <section id="upload" class="pt-12 pb-16 sm:pt-16 sm:pb-20 bg-gradient-to-b from-slate-50 via-white to-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-5">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        No Blood Draws Required — Works With Any Existing Lab PDF or Photo
+  <section id="upload" class="relative pt-12 pb-16 sm:pt-16 sm:pb-20 bg-gradient-to-b from-slate-50 via-white to-white hero-grid">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-emerald-200 shadow-xs text-emerald-800 text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Zero-Hardware Biomarker Intelligence • Instant PDF &amp; Photo Parsing
       </div>
-      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-        “Normal” Lab Results Aren’t Always <span class="text-emerald-600">Optimal.</span>
+
+      <h1 class="text-3xl sm:text-5xl lg:text-[54px] font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+        “Normal” Lab Results Aren’t Always <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Optimal.</span>
       </h1>
-      <p class="mt-4 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-        Upload your Quest, LabCorp, LifeLabs, or hospital PDF or smartphone photo. Our AI translates complex biomarkers into clear, optimal longevity ranges in seconds.
+      <p class="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        Standard hospital reference ranges are designed to detect late-stage disease—not peak energy, metabolic health, or longevity. Upload any Quest, LabCorp, LifeLabs, or hospital lab report for a functional breakdown.
       </p>
 
+      <!-- Key Value Metrics Bar -->
+      <div class="mt-7 grid grid-cols-3 gap-3 max-w-xl mx-auto text-center">
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl py-2.5 px-3">
+          <div class="text-base sm:text-lg font-extrabold text-slate-900">100+</div>
+          <div class="text-[11px] font-medium text-slate-500">Biomarkers Mapped</div>
+        </div>
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl py-2.5 px-3">
+          <div class="text-base sm:text-lg font-extrabold text-emerald-600">15–45s</div>
+          <div class="text-[11px] font-medium text-slate-500">Deep PDF Analysis</div>
+        </div>
+        <div class="bg-white/90 border border-slate-200/80 rounded-xl py-2.5 px-3">
+          <div class="text-base sm:text-lg font-extrabold text-slate-900">$0</div>
+          <div class="text-[11px] font-medium text-slate-500">New Blood Draw Cost</div>
+        </div>
+      </div>
+
       <!-- Interactive Dropzone Card -->
-      <div class="mt-9 max-w-2xl mx-auto bg-white rounded-2xl border-2 border-dashed border-emerald-300 hover:border-emerald-500 p-6 sm:p-8 emerald-glow transition">
+      <div class="mt-9 max-w-2xl mx-auto bg-white rounded-2xl border-2 border-dashed border-emerald-400/80 hover:border-emerald-600 p-6 sm:p-9 emerald-glow transition">
         <input type="file" id="labFileInput" accept=".pdf,image/*" class="hidden" onchange="handleFileUpload(event)" />
 
         <div id="dropzoneIdle" class="flex flex-col items-center">
-          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <div class="w-13 h-13 p-3 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-3.5">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
             </svg>
           </div>
-          <h2 class="text-lg font-bold text-slate-900">Upload Your Lab Report (PDF or Photo)</h2>
-          <p class="text-sm text-slate-500 mt-1">Supports PDF, JPG, PNG, or HEIC up to 10 MB • First report free</p>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">Upload Your Lab Report (PDF or Photo)</h2>
+          <p class="text-sm text-slate-500 mt-1">Supports multi-page PDF, JPG, PNG, or HEIC up to 10 MB • First full report free</p>
 
-          <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <button onclick="triggerFileSelect()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm transition">
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="triggerFileSelect()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-sm transition">
               Select Lab PDF or Photo
             </button>
-            <button onclick="runSampleDemo()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm px-4 py-2.5 rounded-xl transition">
-              Try Sample Report
+            <button onclick="runSampleDemo()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm px-5 py-3 rounded-xl transition">
+              Preview Sample Report
             </button>
           </div>
+
+          <p class="mt-4 text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Encrypted TLS transmission • Files are processed in-memory and never sold
+          </p>
         </div>
 
-        <!-- Loading State -->
+        <!-- Realistic Multi-Stage Loading State (15–45 seconds) -->
         <div id="dropzoneLoading" class="hidden py-6 flex flex-col items-center">
-          <div class="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3"></div>
-          <p id="loadingStatusText" class="text-sm font-semibold text-slate-800">Extracting biomarkers & comparing against optimal longevity targets...</p>
-          <p class="text-xs text-slate-500 mt-1">Usually takes 5–10 seconds</p>
+          <div class="relative w-12 h-12 mb-4">
+            <div class="absolute inset-0 border-4 border-emerald-100 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p id="loadingStatusText" class="text-sm sm:text-base font-bold text-slate-900">Step 1 of 4: Securely reading your lab document...</p>
+          <p id="loadingSubText" class="text-xs text-slate-500 mt-1.5 max-w-md">
+            Multi-page PDFs typically take <strong class="text-slate-700">15–45 seconds</strong> to extract every biomarker, unit, and functional longevity range. Please keep this tab open.
+          </p>
+          <div class="mt-4 w-full max-w-xs bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div id="loadingProgressBar" class="bg-emerald-600 h-2 rounded-full transition-all duration-700" style="width: 15%"></div>
+          </div>
+          <p id="loadingTimerText" class="text-[11px] font-medium text-emerald-700 mt-2">Elapsed: 0s</p>
         </div>
 
         <!-- Error / Upgrade Prompt -->
@@ -104,60 +166,96 @@
       </div>
 
       <!-- AI Parsed Results Container -->
-      <div id="resultsContainer" class="hidden mt-8 max-w-3xl mx-auto text-left bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-7">
+      <div id="resultsContainer" class="hidden mt-8 max-w-3xl mx-auto text-left bg-white border border-slate-200 rounded-2xl shadow-md p-6 sm:p-8">
+        <!-- Print-Only Brand Header -->
+        <div class="hidden print-only mb-4 pb-3 border-b-2 border-emerald-600 flex items-center justify-between">
+          <div>
+            <div class="font-extrabold text-lg text-slate-900">TrueRange Labs</div>
+            <div class="text-xs text-slate-500">Precision Biomarker &amp; Functional Longevity Summary • TrueRangeLabs.com</div>
+          </div>
+          <div id="printDateLabel" class="text-xs font-semibold text-slate-500"></div>
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">TrueRange Biomarker Breakdown</span>
             <h3 id="resultFileName" class="text-lg font-bold text-slate-900 mt-0.5">Lab Analysis</h3>
           </div>
-          <button onclick="resetDropzone()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">
-            Upload Another Report
-          </button>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button onclick="downloadReportPDF()" class="text-xs font-semibold px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Save / Print PDF
+            </button>
+            <button onclick="resetDropzone()" class="text-xs font-semibold px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              Upload Another
+            </button>
+          </div>
         </div>
 
-        <p id="resultSummary" class="mt-4 text-sm text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 leading-relaxed"></p>
-        <div id="biomarkerCards" class="mt-4 space-y-3"></div>
+        <p id="resultSummary" class="mt-4 text-sm text-slate-700 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200/70 leading-relaxed"></p>
+        <div id="biomarkerCards" class="mt-5 space-y-3.5"></div>
+
+        <!-- Print-Only Medical Disclaimer Footer -->
+        <div class="hidden print-only mt-6 pt-3 border-t border-slate-200 text-[10px] text-slate-500 leading-relaxed">
+          <strong>Educational Wellness Disclaimer:</strong> Generated by TrueRange Labs (TrueRangeLabs.com). Functional optimal ranges are for educational discussion only and do not constitute medical diagnosis or treatment. Review all biomarkers with a licensed physician.
+        </div>
+      </div>
+
+      <!-- Supported Lab Compatibility Strip -->
+      <div class="mt-12 pt-6 border-t border-slate-200/60">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Compatible With Reports From Major Diagnostic Networks</p>
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs sm:text-sm font-bold text-slate-400">
+          <span>QUEST DIAGNOSTICS</span>
+          <span>LABCORP</span>
+          <span>LIFELABS</span>
+          <span>DYNACARE</span>
+          <span>MYCHART / HOSPITAL PDFS</span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- How It Works -->
-  <section id="how-it-works" class="py-14 bg-slate-50 border-y border-slate-200/70">
+  <section id="how-it-works" class="py-16 bg-slate-50 border-y border-slate-200/70">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
       <div class="text-center max-w-2xl mx-auto">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">How TrueRange Labs Works</h2>
-        <p class="mt-2 text-sm sm:text-base text-slate-600">Three simple steps to understand what your lab numbers actually mean for energy, metabolism, and longevity.</p>
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Seamless Workflow</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">How TrueRange Labs Works</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Three simple steps to turn confusing lab printouts into clear, actionable health intelligence.</p>
       </div>
-      <div class="mt-9 grid sm:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
-          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">1</div>
-          <h3 class="font-bold text-slate-900">Upload PDF or Photo</h3>
-          <p class="text-sm text-slate-600 mt-1.5">Snap a clear photo of your printed lab sheet or upload any PDF from your patient portal.</p>
+      <div class="mt-10 grid sm:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-4">1</div>
+          <h3 class="font-bold text-slate-900 text-base">Upload PDF or Photo</h3>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">Snap a clear smartphone photo of your printed lab sheet or upload any multi-page PDF directly from your patient portal.</p>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
-          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">2</div>
-          <h3 class="font-bold text-slate-900">AI Range Normalization</h3>
-          <p class="text-sm text-slate-600 mt-1.5">Our engine extracts every marker and compares standard disease-screening ranges against optimal targets.</p>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-4">2</div>
+          <h3 class="font-bold text-slate-900 text-base">AI Range Normalization</h3>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">In 15–45 seconds, our parser extracts every biomarker and benchmarks standard pathology ranges against optimal longevity targets.</p>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
-          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-3">3</div>
-          <h3 class="font-bold text-slate-900">Plain-English Action Plan</h3>
-          <p class="text-sm text-slate-600 mt-1.5">Get clear explanations and smart follow-up questions to bring to your next doctor visit.</p>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mb-4">3</div>
+          <h3 class="font-bold text-slate-900 text-base">Save &amp; Share Doctor Report</h3>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">Download a clean PDF summary with color-coded status flags to bring to your next physician consultation.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Normal vs Optimal Comparison -->
-  <section id="compare" class="py-14 bg-white">
+  <section id="compare" class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-8">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Standard Lab Range vs. Optimal Target</h2>
-        <p class="mt-2 text-sm sm:text-base text-slate-600">Why you can feel exhausted or foggy even when your doctor says “everything looks normal.”</p>
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">The Clinical Blind Spot</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Standard Lab Range vs. Optimal Target</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Why millions of patients feel fatigued or foggy even when told “everything looks normal.”</p>
       </div>
 
-      <div class="space-y-3">
-        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+      <div class="space-y-4">
+        <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-slate-50/60 hover:border-emerald-300 transition">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <span class="font-bold text-slate-900 text-base">Ferritin</span>
@@ -168,10 +266,10 @@
               <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 50 – 120 ng/mL</span>
             </div>
           </div>
-          <p class="mt-2 text-sm text-slate-600 leading-relaxed">Levels between 16–35 ng/mL are flagged “normal” even though low iron stores commonly cause low stamina, brain fog, and hair thinning.</p>
+          <p class="mt-2.5 text-sm text-slate-600 leading-relaxed">Levels between 16–35 ng/mL are flagged “normal” even though low iron stores commonly cause low stamina, brain fog, and hair thinning.</p>
         </div>
 
-        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+        <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-slate-50/60 hover:border-emerald-300 transition">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <span class="font-bold text-slate-900 text-base">Vitamin D (25-OH)</span>
@@ -182,10 +280,10 @@
               <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 50 – 80 ng/mL</span>
             </div>
           </div>
-          <p class="mt-2 text-sm text-slate-600 leading-relaxed">30 ng/mL merely prevents bone softening; longevity clinicians target 50–80 ng/mL for resilient immunity, mood, and hormone balance.</p>
+          <p class="mt-2.5 text-sm text-slate-600 leading-relaxed">30 ng/mL merely prevents bone softening; longevity clinicians target 50–80 ng/mL for resilient immunity, mood, and hormone balance.</p>
         </div>
 
-        <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/60">
+        <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-slate-50/60 hover:border-emerald-300 transition">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <span class="font-bold text-slate-900 text-base">Fasting Insulin</span>
@@ -196,7 +294,7 @@
               <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">Optimal: 2.0 – 6.0 µIU/mL</span>
             </div>
           </div>
-          <p class="mt-2 text-sm text-slate-600 leading-relaxed">Elevated fasting insulin signals early insulin resistance years before fasting glucose or HbA1c ever leave the normal range.</p>
+          <p class="mt-2.5 text-sm text-slate-600 leading-relaxed">Elevated fasting insulin signals early insulin resistance years before fasting glucose or HbA1c ever leave the normal range.</p>
         </div>
       </div>
     </div>
@@ -206,7 +304,8 @@
   <section id="pricing" class="py-16 bg-slate-50 border-t border-slate-200/80">
     <div class="max-w-4xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-10">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Simple, Transparent Pricing</h2>
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">High-Margin SaaS Model</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Simple, Transparent Pricing</h2>
         <p class="mt-2 text-sm sm:text-base text-slate-600">Try your first lab report free. Upgrade anytime for unlimited uploads.</p>
       </div>
 
@@ -217,13 +316,13 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Free Starter</span>
             <div class="mt-2 flex items-baseline gap-1">
               <span class="text-4xl font-extrabold text-slate-900">$0</span>
-              <span class="text-sm text-slate-500">/ one-time test</span>
+              <span class="text-sm text-slate-500">/ first lab audit</span>
             </div>
             <p class="mt-3 text-sm text-slate-600">See how TrueRange translates your real lab numbers before subscribing.</p>
             <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
               <li>✓ 1 Full AI Lab Report Analysis (PDF or Photo)</li>
               <li>✓ Standard vs. Optimal Range Comparison</li>
-              <li>✓ Plain-English Biomarker Explanations</li>
+              <li>✓ Plain-English Explanations &amp; PDF Export</li>
             </ul>
           </div>
           <button onclick="openAuthModal()" class="mt-7 w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-emerald-600 text-slate-800 font-semibold text-sm transition">
@@ -246,7 +345,7 @@
             <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
               <li>✓ Unlimited PDF &amp; Photo Lab Uploads</li>
               <li>✓ Full Longevity &amp; Functional Range Targets</li>
-              <li>✓ Doctor Visit Question Generator</li>
+              <li>✓ Printable Doctor Visit PDF Summaries</li>
               <li>✓ Cancel anytime in 1 click via PayPal</li>
             </ul>
           </div>
@@ -258,6 +357,161 @@
             </div>
             <p class="text-center text-xs text-slate-400 mt-2">Billed at $19 USD/month via PayPal. Cancel anytime.</p>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-16 bg-white border-t border-slate-200/80">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Common Questions</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Frequently Asked Questions</h2>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Everything you need to know about TrueRange Labs, data privacy, and reporting.</p>
+      </div>
+
+      <div class="space-y-3">
+        <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition" open>
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
+            <span>How is “Optimal Range” different from my lab’s standard range?</span>
+            <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Standard hospital and commercial lab ranges are calculated from population averages—meaning they flag acute pathology rather than optimal vitality. TrueRange Labs maps each marker against tighter preventative and functional longevity ranges used by preventative medicine clinicians.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
+            <span>How long does a lab PDF or photo upload take to analyze?</span>
+            <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Most single-page photos and multi-page clinical PDFs take <strong>15–45 seconds</strong>. During this window, our multimodal engine reads every page, normalizes units, cross-checks both standard and functional ranges, and writes tailored clinician follow-up notes.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
+            <span>Which labs and file formats are supported?</span>
+            <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            You can upload downloaded PDFs or clear smartphone photos (JPG, PNG, HEIC up to 10 MB) from Quest Diagnostics, LabCorp, LifeLabs, Dynacare, hospital patient portals, or international labs.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
+            <span>Is my lab report private and secure? Can I save my results?</span>
+            <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Yes. All uploads travel over encrypted HTTPS/TLS, are processed in-memory to extract biomarker values, and are never sold or shared. You can tap <strong>Save / Print PDF</strong> right on your results card to export a clean copy for your records or doctor visit.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
+            <span>How does the free report and $19/month Pro subscription work?</span>
+            <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Every free account includes 1 full AI lab analysis at zero cost. If you want unlimited uploads for repeat panels, hormone/metabolic tracking, or family reports, TrueRange Pro is $19 USD/month and can be canceled anytime in one click via PayPal.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Investor Relations & Strategic Contact Section -->
+  <section id="investors" class="py-16 bg-slate-900 text-white border-t border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="grid lg:grid-cols-12 gap-10 items-start">
+        <!-- Left Column: Investor Thesis & Direct Email -->
+        <div class="lg:col-span-6">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+            Investor Relations &amp; Partnerships
+          </span>
+          <h2 class="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Building the Intelligence Layer for Preventative Diagnostics
+          </h2>
+          <p class="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed">
+            Over 14 billion lab tests are ordered annually in North America alone, yet patients receive raw PDFs without longitudinal context. TrueRange Labs turns existing diagnostic data into an immediate, zero-CAC consumer subscription and clinical API platform.
+          </p>
+
+          <div class="mt-6 grid grid-cols-2 gap-3.5 text-left">
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">Zero Hardware</div>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">Instant software onboarding using labs consumers already own—no phlebotomy logistics.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">B2C + B2B Wedge</div>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">$19/mo consumer SaaS expanding into white-label longevity clinic &amp; telehealth APIs.</p>
+            </div>
+          </div>
+
+          <!-- Direct Investor Email Box -->
+          <div class="mt-7 p-4 rounded-2xl bg-slate-800 border border-slate-700 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Direct Founder &amp; Investor Desk</div>
+              <a href="mailto:investors@truerangelabs.com" class="text-sm sm:text-base font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-4">
+                investors@truerangelabs.com
+              </a>
+            </div>
+            <button type="button" onclick="copyInvestorEmail()" id="copyEmailBtn" class="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition">
+              Copy Email
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Investor Contact Form (Wired to Web3Forms) -->
+        <div class="lg:col-span-6 bg-white text-slate-900 rounded-2xl p-6 sm:p-7 shadow-xl">
+          <h3 class="text-lg font-bold text-slate-900">Connect With the Founder</h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Request our investor brief, live product walkthrough, or discuss strategic clinic partnerships.
+          </p>
+
+          <form onsubmit="handleInvestorContact(event)" class="mt-5 space-y-3.5">
+            <div class="grid sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                <input type="text" id="invName" required placeholder="Alex Morgan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Firm / Organization</label>
+                <input type="text" id="invFirm" placeholder="Apex Health Ventures" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Work Email</label>
+                <input type="email" id="invEmail" required placeholder="alex@firm.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Inquiry Type</label>
+                <select id="invType" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-emerald-600">
+                  <option value="Angel / Seed Investment">Angel / Seed Investment</option>
+                  <option value="Clinic / API Partnership">Clinic / API Partnership</option>
+                  <option value="Clinical Advisory">Clinical Advisory</option>
+                  <option value="Press / Media">Press / Media</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Message</label>
+              <textarea id="invMessage" rows="3" required placeholder="Tell us a bit about your fund, clinic, or partnership interest..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600"></textarea>
+            </div>
+
+            <p id="invFeedback" class="hidden text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-3"></p>
+
+            <button type="submit" id="invSubmitBtn" class="w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm transition">
+              Send Investor Inquiry
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -309,6 +563,7 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentSession = null;
+    let uploadTimerInterval = null;
 
     async function refreshSession() {
       const { data } = await sb.auth.getSession();
@@ -381,7 +636,43 @@
       document.getElementById('labFileInput').click();
     }
 
+    function stopUploadProgress() {
+      if (uploadTimerInterval) {
+        clearInterval(uploadTimerInterval);
+        uploadTimerInterval = null;
+      }
+    }
+
+    function startUploadProgress() {
+      stopUploadProgress();
+      let seconds = 0;
+      const statusEl = document.getElementById('loadingStatusText');
+      const barEl = document.getElementById('loadingProgressBar');
+      const timerEl = document.getElementById('loadingTimerText');
+
+      statusEl.textContent = 'Step 1 of 4: Securely reading your lab document...';
+      barEl.style.width = '18%';
+      timerEl.textContent = 'Elapsed: 0s (typically 15–45s)';
+
+      uploadTimerInterval = setInterval(() => {
+        seconds += 1;
+        timerEl.textContent = `Elapsed: ${seconds}s (typically 15–45s)`;
+
+        if (seconds === 5) {
+          statusEl.textContent = 'Step 2 of 4: Extracting biomarkers, units & reference ranges...';
+          barEl.style.width = '45%';
+        } else if (seconds === 14) {
+          statusEl.textContent = 'Step 3 of 4: Benchmarking against functional longevity ranges...';
+          barEl.style.width = '72%';
+        } else if (seconds === 26) {
+          statusEl.textContent = 'Step 4 of 4: Finalizing plain-English explanations & doctor questions...';
+          barEl.style.width = '90%';
+        }
+      }, 1000);
+    }
+
     function resetDropzone() {
+      stopUploadProgress();
       document.getElementById('dropzoneIdle').classList.remove('hidden');
       document.getElementById('dropzoneLoading').classList.add('hidden');
       document.getElementById('dropzoneError').classList.add('hidden');
@@ -402,6 +693,7 @@
       document.getElementById('dropzoneError').classList.add('hidden');
       document.getElementById('resultsContainer').classList.add('hidden');
       document.getElementById('dropzoneLoading').classList.remove('hidden');
+      startUploadProgress();
 
       try {
         const base64 = await new Promise((resolve, reject) => {
@@ -425,6 +717,7 @@
         });
 
         const data = await res.json();
+        stopUploadProgress();
         document.getElementById('dropzoneLoading').classList.add('hidden');
 
         if (!res.ok) {
@@ -436,6 +729,7 @@
 
         renderResults(file.name, data);
       } catch (err) {
+        stopUploadProgress();
         document.getElementById('dropzoneLoading').classList.add('hidden');
         document.getElementById('dropzoneIdle').classList.remove('hidden');
         document.getElementById('errorMessageText').textContent = 'Network error uploading file. Please try again.';
@@ -446,6 +740,10 @@
     function renderResults(title, data) {
       document.getElementById('resultFileName').textContent = title;
       document.getElementById('resultSummary').textContent = data.summary || '';
+      const dateEl = document.getElementById('printDateLabel');
+      if (dateEl) {
+        dateEl.textContent = 'Generated: ' + new Date().toLocaleDateString();
+      }
       const container = document.getElementById('biomarkerCards');
       container.innerHTML = '';
 
@@ -476,6 +774,14 @@
       });
 
       document.getElementById('resultsContainer').classList.remove('hidden');
+    }
+
+    function downloadReportPDF() {
+      const originalTitle = document.title;
+      const reportName = document.getElementById('resultFileName').textContent || 'Lab-Report';
+      document.title = `TrueRange-Labs-${reportName.replace(/[^a-z0-9]/gi, '_')}`;
+      window.print();
+      document.title = originalTitle;
     }
 
     function runSampleDemo() {
@@ -512,6 +818,65 @@
           }
         ]
       });
+    }
+
+    function copyInvestorEmail() {
+      navigator.clipboard.writeText('investors@truerangelabs.com');
+      const btn = document.getElementById('copyEmailBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy Email'; }, 2000);
+    }
+
+    async function handleInvestorContact(e) {
+      e.preventDefault();
+      const name = document.getElementById('invName').value.trim();
+      const firm = document.getElementById('invFirm').value.trim();
+      const email = document.getElementById('invEmail').value.trim();
+      const inquiryType = document.getElementById('invType').value;
+      const message = document.getElementById('invMessage').value.trim();
+      const feedback = document.getElementById('invFeedback');
+      const btn = document.getElementById('invSubmitBtn');
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      feedback.classList.add('hidden');
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            access_key: '9e1e0e7f-e6c5-4f96-bdda-a7f28b2e8dc4',
+            subject: `[TrueRange Labs — ${inquiryType}] ${name}${firm ? ' (' + firm + ')' : ''}`,
+            from_name: 'TrueRange Labs Investor Desk',
+            name: name,
+            organization: firm || 'N/A',
+            email: email,
+            inquiry_type: inquiryType,
+            message: message
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          feedback.className = 'text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-3';
+          feedback.textContent = 'Thank you! Your inquiry has been delivered directly to our founder desk.';
+          feedback.classList.remove('hidden');
+          e.target.reset();
+        } else {
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        feedback.className = 'text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3';
+        feedback.textContent = 'Could not submit form automatically. Please email us directly at investors@truerangelabs.com.';
+        feedback.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Investor Inquiry';
+      }
     }
 
     if (window.paypal) {
@@ -552,4 +917,3 @@
   </script>
 </body>
 </html>
-
