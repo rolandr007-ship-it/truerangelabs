@@ -81,8 +81,8 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
   ]
 }`;
 
-    let response;
-    const models = ['gemini-3.8-flash', 'gemini-3.8-flash', 'gemini-3.8-flash-lite'];
+        let response;
+    const models = ['gemini-3.8-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash-lite'];
     for (let i = 0; i < models.length; i++) {
       try {
         response = await ai.models.generateContent({
@@ -102,31 +102,11 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
         });
         break;
       } catch (err) {
-        if ((err?.status === 503 || err?.code === 503) && i < models.length - 1) {
+        const msg = String(err?.message || '');
+        if ((err?.status === 503 || msg.includes('503') || msg.includes('404')) && i < models.length - 1) {
           await new Promise((r) => setTimeout(r, 1500));
           continue;
         }
         throw err;
       }
     }
-
-    const cleanText = response.text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleanText);
-
-    if (profile.plan !== 'pro') {
-      await supabaseAdmin
-        .from('profiles')
-        .update({ free_reports_used: (profile.free_reports_used || 0) + 1 })
-        .eq('id', user.id);
-    }
-
-    return res.status(200).json({
-      ...parsed,
-      plan: profile.plan,
-      freeReportsRemaining: profile.plan === 'pro' ? 'Unlimited' : 0
-    });
-  } catch (err) {
-    console.error('Analyze error:', err);
-    return res.status(500).json({ error: 'Failed to parse lab report. Please ensure the PDF or photo is legible and under 10MB.' });
-  }
-}
