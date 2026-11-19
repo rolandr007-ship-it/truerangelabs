@@ -62,43 +62,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No file received. Please select a PDF or photo.' });
     }
 
-    const prompt = `You are a preventative medicine and clinical biomarker analyst.
-Extract every lab biomarker from the attached lab report.
-Return ONLY valid JSON matching this exact structure (no markdown, no extra text):
+    const prompt = `Extract all clinical lab biomarkers from this lab report and compare each against preventative functional longevity ranges.
+Return ONLY valid JSON matching this schema (keep explanations concise, 1 sentence each):
 {
-  "summary": "2-3 sentence plain-English overview highlighting optimal markers and any suboptimal or out-of-range markers.",
+  "summary": "2-sentence overview highlighting optimal markers and any suboptimal or out-of-range markers.",
   "biomarkers": [
     {
       "name": "Biomarker Name",
-      "category": "Body System (e.g. Metabolic, Thyroid, Iron Stores, Lipids, Vitamins)",
-      "value": "Measured value with unit",
-      "standardRange": "Lab standard reference range",
-      "optimalRange": "Preventative functional longevity target range",
+      "category": "System (e.g. Metabolic, Thyroid, Iron, Lipids, Vitamins, CBC)",
+      "value": "Measured value + unit",
+      "standardRange": "Lab standard range",
+      "optimalRange": "Functional longevity optimal range",
       "status": "Optimal or Suboptimal or Out of Range",
-      "explanation": "1-2 sentence plain-English explanation of what this result means."
+      "explanation": "Concise 1-sentence plain-English takeaway."
     }
   ]
 }`;
 
-    // Active multimodal Gemini models with automatic retry on temporary 503 spikes
-    const models = [
-      'gemini-3.8-flash',
-      'gemini-3.8-flash',
-      'gemini-3.5-flash',
-      'gemini-3.1-flash-lite',
-      'gemini-3-flash-preview'
-    ];
+    // Fast multimodal models first, 22s max per attempt so total runtime never exceeds Vercel's 60s limit
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
     let parsedResult = null;
     let lastError = '';
 
-    for (let i = 0; i < models.length; i++) {
-      const model = models[i];
-      if (i > 0) {
-        await new Promise((r) => setTimeout(r, 1500));
-      }
-
+    for (const model of models) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 22000);
 
       try {
         const geminiResponse = await fetch(
@@ -122,8 +110,12 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
                 }
               ],
               generationConfig: {
-                temperature: 0.2,
-                responseMimeType: 'application/json'
+                temperature: 0.1,
+                maxOutputTokens: 4096,
+                responseMimeType: 'application/json',
+                thinkingConfig: {
+                  thinkingBudget: 0
+                }
               }
             })
           }
@@ -133,8 +125,8 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
 
         if (!geminiResponse.ok) {
           const errText = await geminiResponse.text();
-          lastError = `${model} (${geminiResponse.status}): ${errText.slice(0, 160)}`;
-          console.error('Gemini model failed:', lastError);
+          lastError = `${model} (${geminiResponse.status})`;
+          console.error('Gemini model failed:', lastError, errText.slice(0, 150));
           continue;
         }
 
@@ -148,14 +140,14 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
         }
       } catch (modelErr) {
         clearTimeout(timeoutId);
-        lastError = `${model}: ${modelErr.message}`;
+        lastError = modelErr.name === 'AbortError' ? `${model} timed out` : `${model}: ${modelErr.message}`;
         console.error('Gemini exception:', lastError);
       }
     }
 
     if (!parsedResult || !Array.isArray(parsedResult.biomarkers)) {
       return res.status(502).json({
-        error: `AI service is temporarily busy. Please tap Select Lab PDF or Photo to try again (${lastError}).`
+        error: `AI service is temporarily busy (${lastError}). Please tap Select Lab PDF or Photo to try again.`
       });
     }
 
