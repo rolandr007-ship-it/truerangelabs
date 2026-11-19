@@ -81,14 +81,13 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
   ]
 }`;
 
-                let response;
-    const models = [
-      'gemini-2.5-flash-lite',
-      'gemini-3.8-flash-lite',
+                    const models = [
       'gemini-3.8-flash',
-      'gemini-3-flash-preview',
-      'gemini-2.5-flash-lite'
+      'gemini-3.8-flash-lite',
+      'gemini-2.5-flash-lite',
+      'gemini-3-flash-preview'
     ];
+
     for (let i = 0; i < models.length; i++) {
       try {
         response = await ai.models.generateContent({
