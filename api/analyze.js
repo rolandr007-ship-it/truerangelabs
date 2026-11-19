@@ -81,8 +81,14 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
   ]
 }`;
 
-            let response;
-    const models = ['gemini-2.5-flash-lite', 'gemini-3.8-flash-lite', 'gemini-3.8-flash'];
+                let response;
+    const models = [
+      'gemini-2.5-flash-lite',
+      'gemini-3.8-flash-lite',
+      'gemini-3.8-flash',
+      'gemini-3-flash-preview',
+      'gemini-2.5-flash-lite'
+    ];
     for (let i = 0; i < models.length; i++) {
       try {
         response = await ai.models.generateContent({
@@ -104,12 +110,13 @@ Return ONLY valid JSON matching this exact structure (no markdown backticks):
         break;
       } catch (err) {
         if (i < models.length - 1) {
-          await new Promise((r) => setTimeout(r, 1000));
+          await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
           continue;
         }
         throw err;
       }
     }
+
 
         const cleanText = response.text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleanText);
