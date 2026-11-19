@@ -80,11 +80,23 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
   ]
 }`;
 
-    const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+    // Active multimodal Gemini models with automatic retry on temporary 503 spikes
+    const models = [
+      'gemini-3.8-flash',
+      'gemini-3.8-flash',
+      'gemini-3.5-flash',
+      'gemini-3.1-flash-lite',
+      'gemini-3-flash-preview'
+    ];
     let parsedResult = null;
     let lastError = '';
 
-    for (const model of models) {
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
+      if (i > 0) {
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
 
@@ -121,7 +133,7 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
 
         if (!geminiResponse.ok) {
           const errText = await geminiResponse.text();
-          lastError = `${model} (${geminiResponse.status}): ${errText.slice(0, 180)}`;
+          lastError = `${model} (${geminiResponse.status}): ${errText.slice(0, 160)}`;
           console.error('Gemini model failed:', lastError);
           continue;
         }
@@ -143,7 +155,7 @@ Return ONLY valid JSON matching this exact structure (no markdown, no extra text
 
     if (!parsedResult || !Array.isArray(parsedResult.biomarkers)) {
       return res.status(502).json({
-        error: `Could not parse report (${lastError || 'check file legibility'}).`
+        error: `AI service is temporarily busy. Please tap Select Lab PDF or Photo to try again (${lastError}).`
       });
     }
 
