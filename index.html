@@ -63,7 +63,7 @@
         <a href="#compare" class="hover:text-emerald-700 transition">Normal vs. Optimal</a>
         <a href="#pricing" class="hover:text-emerald-700 transition">Pricing</a>
         <a href="#faq" class="hover:text-emerald-700 transition">FAQ</a>
-        <a href="#investors" class="hover:text-emerald-700 transition">Investors</a>
+        <a href="#investors" class="hover:text-emerald-700 transition">Clinics &amp; Investors</a>
       </nav>
 
       <div class="flex items-center gap-2.5 sm:gap-3">
@@ -158,8 +158,8 @@
         <!-- Error / Upgrade Prompt -->
         <div id="dropzoneError" class="hidden mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-left">
           <p id="errorMessageText" class="text-sm font-medium text-amber-900"></p>
-          <div class="mt-3 flex gap-3">
-            <a href="#pricing" class="text-xs font-bold bg-emerald-600 text-white px-3.5 py-2 rounded-lg hover:bg-emerald-700">Unlock Unlimited ($19/mo)</a>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <a href="#pricing" class="text-xs font-bold bg-emerald-600 text-white px-3.5 py-2 rounded-lg hover:bg-emerald-700">View Plans (From $19/mo)</a>
             <button onclick="resetDropzone()" class="text-xs font-semibold text-slate-600 hover:text-slate-900">Dismiss</button>
           </div>
         </div>
@@ -300,50 +300,50 @@
     </div>
   </section>
 
-  <!-- Pricing with PayPal Subscription -->
+  <!-- 4-Tier Pricing (Personal + Clinic + Enterprise) -->
   <section id="pricing" class="py-16 bg-slate-50 border-t border-slate-200/80">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-10">
-        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">High-Margin SaaS Model</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Personal &amp; Clinical Plans</span>
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Simple, Transparent Pricing</h2>
-        <p class="mt-2 text-sm sm:text-base text-slate-600">Try your first lab report free. Upgrade anytime for unlimited uploads.</p>
+        <p class="mt-2 text-sm sm:text-base text-slate-600">Try your first lab report free. Choose a personal plan or scale across your clinic.</p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6 items-stretch">
-        <!-- Free Starter -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-7 flex flex-col justify-between">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+        <!-- 1. Free Starter -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Free Starter</span>
             <div class="mt-2 flex items-baseline gap-1">
-              <span class="text-4xl font-extrabold text-slate-900">$0</span>
-              <span class="text-sm text-slate-500">/ first lab audit</span>
+              <span class="text-3xl font-extrabold text-slate-900">$0</span>
+              <span class="text-xs text-slate-500">/ first lab audit</span>
             </div>
-            <p class="mt-3 text-sm text-slate-600">See how TrueRange translates your real lab numbers before subscribing.</p>
-            <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
-              <li>✓ 1 Full AI Lab Report Analysis (PDF or Photo)</li>
+            <p class="mt-3 text-xs text-slate-600 leading-relaxed">See how TrueRange translates your real lab numbers before subscribing.</p>
+            <ul class="mt-5 space-y-2 text-xs text-slate-700">
+              <li>✓ <strong>1 Full AI Lab Report</strong> (PDF or Photo)</li>
               <li>✓ Standard vs. Optimal Range Comparison</li>
-              <li>✓ Plain-English Explanations &amp; PDF Export</li>
+              <li>✓ Plain-English Takeaways &amp; PDF Export</li>
             </ul>
           </div>
-          <button onclick="openAuthModal()" class="mt-7 w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-emerald-600 text-slate-800 font-semibold text-sm transition">
+          <button onclick="openAuthModal()" class="mt-7 w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:border-emerald-600 text-slate-800 font-semibold text-xs transition">
             Create Free Account
           </button>
         </div>
 
-        <!-- TrueRange Pro ($19/mo) -->
-        <div class="bg-white rounded-2xl border-2 border-emerald-600 p-7 shadow-lg relative flex flex-col justify-between">
-          <div class="absolute -top-3 right-6 bg-emerald-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+        <!-- 2. TrueRange Pro ($19/mo — 40 personal reports/mo) -->
+        <div class="bg-white rounded-2xl border-2 border-emerald-600 p-6 shadow-lg relative flex flex-col justify-between">
+          <div class="absolute -top-3 right-5 bg-emerald-600 text-white text-[11px] font-bold px-3 py-0.5 rounded-full">
             Most Popular
           </div>
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">TrueRange Pro</span>
             <div class="mt-2 flex items-baseline gap-1">
-              <span class="text-4xl font-extrabold text-slate-900">$19</span>
-              <span class="text-sm text-slate-500">USD / month</span>
+              <span class="text-3xl font-extrabold text-slate-900">$19</span>
+              <span class="text-xs text-slate-500">USD / month</span>
             </div>
-            <p class="mt-3 text-sm text-slate-600">Unlimited lab translations for ongoing health tracking and family panels.</p>
-            <ul class="mt-5 space-y-2.5 text-sm text-slate-700">
-              <li>✓ Unlimited PDF &amp; Photo Lab Uploads</li>
+            <p class="mt-3 text-xs text-slate-600 leading-relaxed">For individuals tracking personal panels and immediate household health.</p>
+            <ul class="mt-5 space-y-2 text-xs text-slate-700">
+              <li>✓ <strong>40 Personal Reports / Month</strong></li>
               <li>✓ Full Longevity &amp; Functional Range Targets</li>
               <li>✓ Printable Doctor Visit PDF Summaries</li>
               <li>✓ Cancel anytime in 1 click via PayPal</li>
@@ -351,14 +351,60 @@
           </div>
 
           <div class="mt-6">
-            <div id="paypalNotice" class="hidden mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-900"></div>
-            <div class="max-w-[260px] mx-auto">
+            <div id="paypalNotice" class="hidden mb-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] font-medium text-emerald-900"></div>
+            <div class="max-w-[240px] mx-auto">
               <div id="paypal-button-container-P-67A60544K5870822LNL4VK5I"></div>
             </div>
-            <p class="text-center text-xs text-slate-400 mt-2">Billed at $19 USD/month via PayPal. Cancel anytime.</p>
+            <p class="text-center text-[11px] text-slate-400 mt-2">Personal use only • PayPal or Debit/Credit Card</p>
           </div>
         </div>
+
+        <!-- 3. Clinic ($299/mo — 150 reports/mo) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-teal-700">Clinic</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="text-3xl font-extrabold text-slate-900">$299</span>
+              <span class="text-xs text-slate-500">USD / month</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-600 leading-relaxed">Built for solo practitioners, health coaches, naturopaths, &amp; boutique clinics.</p>
+            <ul class="mt-5 space-y-2 text-xs text-slate-700">
+              <li>✓ <strong>150 Patient Reports / Month</strong></li>
+              <li>✓ Multi-Patient Commercial License</li>
+              <li>✓ Printable Patient Consultation PDFs</li>
+              <li>✓ Priority Email Onboarding</li>
+            </ul>
+          </div>
+          <button onclick="selectCommercialPlan('Clinic Plan ($299/mo — 150 reports)')" class="mt-7 w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition">
+            Request Clinic Access
+          </button>
+        </div>
+
+        <!-- 4. Enterprise ($799/mo — 500 reports/mo) -->
+        <div class="bg-slate-900 text-white rounded-2xl border border-slate-800 p-6 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Enterprise / Lab</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="text-3xl font-extrabold text-white">$799</span>
+              <span class="text-xs text-slate-400">USD / month</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-300 leading-relaxed">High-volume biomarker intelligence for multi-provider clinics &amp; diagnostic networks.</p>
+            <ul class="mt-5 space-y-2 text-xs text-slate-200">
+              <li>✓ <strong>500 Reports / Month</strong> Included</li>
+              <li>✓ Commercial &amp; Multi-Provider License</li>
+              <li>✓ Custom Volume Tiers Available</li>
+              <li>✓ Dedicated Account Support</li>
+            </ul>
+          </div>
+          <button onclick="selectCommercialPlan('Enterprise Plan ($799/mo — 500 reports)')" class="mt-7 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
+            Contact Enterprise Desk
+          </button>
+        </div>
       </div>
+
+      <p class="text-center text-xs text-slate-500 mt-6">
+        TrueRange Pro ($19/mo) is licensed for individual personal use only (40-report/month Fair Use allowance). Multi-patient, coaching, or clinical workflows require a Clinic or Enterprise license.
+      </p>
     </div>
   </section>
 
@@ -414,31 +460,31 @@
 
         <details class="group rounded-2xl border border-slate-200 bg-slate-50/50 p-5 open:bg-white open:shadow-xs transition">
           <summary class="flex cursor-pointer items-center justify-between font-bold text-slate-900 text-sm sm:text-base">
-            <span>How does the free report and $19/month Pro subscription work?</span>
+            <span>How do the Personal Pro ($19/mo) and Clinic / Enterprise plans work?</span>
             <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
           </summary>
           <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-            Every free account includes 1 full AI lab analysis at zero cost. If you want unlimited uploads for repeat panels, hormone/metabolic tracking, or family reports, TrueRange Pro is $19 USD/month and can be canceled anytime in one click via PayPal.
+            Every free account includes 1 full AI lab analysis at zero cost. <strong>TrueRange Pro ($19 USD/month)</strong> includes up to <strong>40 personal reports per month</strong> for ongoing individual health tracking and can be canceled anytime in one click via PayPal. Practitioners, coaches, and diagnostic organizations can choose <strong>Clinic ($299/mo for 150 reports)</strong> or <strong>Enterprise ($799/mo for 500 reports)</strong>.
           </p>
         </details>
       </div>
     </div>
   </section>
 
-  <!-- Investor Relations & Strategic Contact Section -->
+  <!-- Investor Relations & Commercial Contact Section -->
   <section id="investors" class="py-16 bg-slate-900 text-white border-t border-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
       <div class="grid lg:grid-cols-12 gap-10 items-start">
         <!-- Left Column: Investor Thesis & Direct Email -->
         <div class="lg:col-span-6">
           <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
-            Investor Relations &amp; Partnerships
+            Clinics, Enterprise &amp; Investor Relations
           </span>
           <h2 class="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             Building the Intelligence Layer for Preventative Diagnostics
           </h2>
           <p class="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed">
-            Over 14 billion lab tests are ordered annually in North America alone, yet patients receive raw PDFs without longitudinal context. TrueRange Labs turns existing diagnostic data into an immediate, zero-CAC consumer subscription and clinical API platform.
+            Over 14 billion lab tests are ordered annually in North America alone, yet patients receive raw PDFs without longitudinal context. TrueRange Labs turns existing diagnostic data into an immediate, zero-CAC consumer subscription and clinical SaaS platform.
           </p>
 
           <div class="mt-6 grid grid-cols-2 gap-3.5 text-left">
@@ -447,15 +493,15 @@
               <p class="mt-1 text-xs text-slate-300 leading-relaxed">Instant software onboarding using labs consumers already own—no phlebotomy logistics.</p>
             </div>
             <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
-              <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">B2C + B2B Wedge</div>
-              <p class="mt-1 text-xs text-slate-300 leading-relaxed">$19/mo consumer SaaS expanding into white-label longevity clinic &amp; telehealth APIs.</p>
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">B2C + B2B SaaS</div>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">$19/mo personal Pro tier scaling into $299–$799/mo clinic and diagnostic lab accounts.</p>
             </div>
           </div>
 
           <!-- Direct Investor Email Box -->
           <div class="mt-7 p-4 rounded-2xl bg-slate-800 border border-slate-700 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Direct Founder &amp; Investor Desk</div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Direct Founder, Clinic &amp; Investor Desk</div>
               <a href="mailto:investors@truerangelabs.com" class="text-sm sm:text-base font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-4">
                 investors@truerangelabs.com
               </a>
@@ -466,11 +512,11 @@
           </div>
         </div>
 
-        <!-- Right Column: Investor Contact Form (Wired to Web3Forms) -->
+        <!-- Right Column: Commercial & Investor Contact Form (Wired to Web3Forms) -->
         <div class="lg:col-span-6 bg-white text-slate-900 rounded-2xl p-6 sm:p-7 shadow-xl">
-          <h3 class="text-lg font-bold text-slate-900">Connect With the Founder</h3>
+          <h3 class="text-lg font-bold text-slate-900">Connect With TrueRange Labs</h3>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Request our investor brief, live product walkthrough, or discuss strategic clinic partnerships.
+            Activate a Clinic/Enterprise account, request our investor brief, or schedule a walkthrough.
           </p>
 
           <form onsubmit="handleInvestorContact(event)" class="mt-5 space-y-3.5">
@@ -480,21 +526,22 @@
                 <input type="text" id="invName" required placeholder="Alex Morgan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Firm / Organization</label>
-                <input type="text" id="invFirm" placeholder="Apex Health Ventures" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Clinic / Firm / Organization</label>
+                <input type="text" id="invFirm" placeholder="Apex Longevity Clinic" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
               </div>
             </div>
 
             <div class="grid sm:grid-cols-2 gap-3.5">
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Work Email</label>
-                <input type="email" id="invEmail" required placeholder="alex@firm.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+                <input type="email" id="invEmail" required placeholder="alex@clinic.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Inquiry Type</label>
                 <select id="invType" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-emerald-600">
+                  <option value="Clinic Plan ($299/mo — 150 reports)">Clinic Plan ($299/mo — 150 reports)</option>
+                  <option value="Enterprise Plan ($799/mo — 500 reports)">Enterprise Plan ($799/mo — 500 reports)</option>
                   <option value="Angel / Seed Investment">Angel / Seed Investment</option>
-                  <option value="Clinic / API Partnership">Clinic / API Partnership</option>
                   <option value="Clinical Advisory">Clinical Advisory</option>
                   <option value="Press / Media">Press / Media</option>
                 </select>
@@ -503,13 +550,13 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Message</label>
-              <textarea id="invMessage" rows="3" required placeholder="Tell us a bit about your fund, clinic, or partnership interest..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600"></textarea>
+              <textarea id="invMessage" rows="3" required placeholder="Tell us about your clinic's monthly lab volume, fund, or partnership interest..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600"></textarea>
             </div>
 
             <p id="invFeedback" class="hidden text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-3"></p>
 
             <button type="submit" id="invSubmitBtn" class="w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm transition">
-              Send Investor Inquiry
+              Send Inquiry
             </button>
           </form>
         </div>
@@ -530,7 +577,7 @@
     <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-200 relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
       <h3 class="text-xl font-bold text-slate-900">Sign In or Create Free Account</h3>
-      <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your Pro subscription.</p>
+      <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your subscription.</p>
 
       <form onsubmit="handleAuthSubmit(event)" class="mt-5 space-y-3.5">
         <div>
@@ -554,8 +601,8 @@
     </div>
   </div>
 
-  <!-- PayPal Subscription SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=BAA6dA1hLyBaD4BV524HwYtNYicUHE0z2UK1zwzNZxz9mskQU25j-rspto6gae6fEc_eb_r6jV5Ds0efR4&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+  <!-- PayPal Subscription SDK (with card funding enabled) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA6dA1hLyBaD4BV524HwYtNYicUHE0z2UK1zwzNZxz9mskQU25j-rspto6gae6fEc_eb_r6jV5Ds0efR4&vault=true&intent=subscription&enable-funding=card" data-sdk-integration-source="button-factory"></script>
 
   <script>
     const SUPABASE_URL = 'https://nrwhpxkwxgdsiwbvplsx.supabase.co';
@@ -593,6 +640,18 @@
     }
     function closeAuthModal() {
       document.getElementById('authModal').classList.add('hidden');
+    }
+
+    function selectCommercialPlan(planOptionValue) {
+      const typeSelect = document.getElementById('invType');
+      const msgBox = document.getElementById('invMessage');
+      if (typeSelect) {
+        typeSelect.value = planOptionValue;
+      }
+      if (msgBox && !msgBox.value.trim()) {
+        msgBox.value = `Hi TrueRange Labs team, we would like to activate ${planOptionValue} for our organization.`;
+      }
+      document.getElementById('investors').scrollIntoView({ behavior: 'smooth' });
     }
 
     async function handleAuthSubmit(e) {
@@ -913,7 +972,7 @@
           body: JSON.stringify({
             access_key: '9e1e0e7f-e6c5-4f96-bdda-a7f28b2e8dc4',
             subject: `[TrueRange Labs — ${inquiryType}] ${name}${firm ? ' (' + firm + ')' : ''}`,
-            from_name: 'TrueRange Labs Investor Desk',
+            from_name: 'TrueRange Labs Desk',
             name: name,
             organization: firm || 'N/A',
             email: email,
@@ -937,7 +996,7 @@
         feedback.classList.remove('hidden');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Send Investor Inquiry';
+        btn.textContent = 'Send Inquiry';
       }
     }
 
@@ -946,10 +1005,9 @@
         style: {
           shape: 'pill',
           color: 'blue',
-          layout: 'horizontal',
+          layout: 'vertical',
           label: 'subscribe',
-          height: 40,
-          tagline: false
+          height: 40
         },
         createSubscription: function(data, actions) {
           return actions.subscription.create({
