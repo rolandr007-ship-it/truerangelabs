@@ -9,6 +9,12 @@ export const config = {
   }
 };
 
+const PLAN_LIMITS = {
+  pro: 40,
+  clinic: 150,
+  enterprise: 500
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -43,17 +49,65 @@ export default async function handler(req, res) {
       .single();
 
     if (!profile) {
+      const nowIso = new Date().toISOString();
       const { data: inserted } = await supabaseAdmin
         .from('profiles')
-        .insert({ id: user.id, email: user.email, plan: 'free', free_reports_used: 0 })
+        .insert({
+          id: user.id,
+          email: user.email,
+          plan: 'free',
+          free_reports_used: 0,
+          monthly_reports_used: 0,
+          billing_cycle_start: nowIso
+        })
         .select('*')
         .single();
-      profile = inserted || { plan: 'free', free_reports_used: 0 };
+      profile = inserted || {
+        plan: 'free',
+        free_reports_used: 0,
+        monthly_reports_used: 0,
+        billing_cycle_start: nowIso
+      };
     }
 
-    if (profile.plan !== 'pro' && (profile.free_reports_used || 0) >= 1) {
+    const userPlan = (profile.plan || 'free').toLowerCase();
+    const monthlyLimit = PLAN_LIMITS[userPlan];
+    let currentMonthlyUsage = profile.monthly_reports_used || 0;
+    let cycleStartIso = profile.billing_cycle_start || new Date().toISOString();
+
+    if (monthlyLimit) {
+      const now = new Date();
+      const cycleStart = profile.billing_cycle_start ? new Date(profile.billing_cycle_start) : now;
+      const daysElapsed = (now - cycleStart) / (1000 * 60 * 60 * 24);
+
+      if (!profile.billing_cycle_start || daysElapsed >= 30) {
+        currentMonthlyUsage = 0;
+        cycleStartIso = now.toISOString();
+        await supabaseAdmin
+          .from('profiles')
+          .update({
+            monthly_reports_used: 0,
+            billing_cycle_start: cycleStartIso,
+            updated_at: cycleStartIso
+          })
+          .eq('id', user.id);
+      }
+
+      if (currentMonthlyUsage >= monthlyLimit) {
+        let upgradeNote = 'Contact support@truerangelabs.com to increase your custom Enterprise volume limit.';
+        if (userPlan === 'pro') {
+          upgradeNote = 'Upgrade to Clinic ($299/mo for 150 reports) or Enterprise ($799/mo for 500 reports).';
+        } else if (userPlan === 'clinic') {
+          upgradeNote = 'Upgrade to Enterprise ($799/mo for 500 reports) or contact support@truerangelabs.com.';
+        }
+
+        return res.status(429).json({
+          error: `You have reached your ${monthlyLimit}-report monthly limit. ${upgradeNote}`
+        });
+      }
+    } else if ((profile.free_reports_used || 0) >= 1) {
       return res.status(403).json({
-        error: 'You have used your 1 free lab report. Upgrade to TrueRange Pro ($19/mo) for unlimited analyses.'
+        error: 'You have used your 1 free lab report. Upgrade to TrueRange Pro ($19/mo) for personal use, Clinic ($299/mo), or Enterprise ($799/mo).'
       });
     }
 
@@ -82,7 +136,7 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
     // Active fast multimodal Gemini models with automatic fallback
     const models = [
       'gemini-3.5-flash-lite',
-      'gemini-3.6-flash',
+      'gemini-3.5-flash',
       'gemini-3.8-flash',
       'gemini-3.1-flash-lite'
     ];
@@ -116,7 +170,6 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
                 }
               ],
               generationConfig: {
-                temperature: 0.1,
                 maxOutputTokens: 4096,
                 responseMimeType: 'application/json'
               }
@@ -156,12 +209,23 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
       });
     }
 
-    if (profile.plan !== 'pro') {
+    const updatedAt = new Date().toISOString();
+
+    if (monthlyLimit) {
+      await supabaseAdmin
+        .from('profiles')
+        .update({
+          monthly_reports_used: currentMonthlyUsage + 1,
+          billing_cycle_start: cycleStartIso,
+          updated_at: updatedAt
+        })
+        .eq('id', user.id);
+    } else {
       await supabaseAdmin
         .from('profiles')
         .update({
           free_reports_used: (profile.free_reports_used || 0) + 1,
-          updated_at: new Date().toISOString()
+          updated_at: updatedAt
         })
         .eq('id', user.id);
     }
