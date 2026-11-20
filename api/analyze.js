@@ -79,14 +79,20 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
   ]
 }`;
 
-    // Fast multimodal models first, 22s max per attempt so total runtime never exceeds Vercel's 60s limit
-    const models = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
+    // Active fast multimodal Gemini models with automatic fallback
+    const models = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.6-flash',
+      'gemini-3.8-flash',
+      'gemini-3.1-flash-lite'
+    ];
+
     let parsedResult = null;
-    let lastError = '';
+    const errors = [];
 
     for (const model of models) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 22000);
+      const timeoutId = setTimeout(() => controller.abort(), 14000);
 
       try {
         const geminiResponse = await fetch(
@@ -112,10 +118,7 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
               generationConfig: {
                 temperature: 0.1,
                 maxOutputTokens: 4096,
-                responseMimeType: 'application/json',
-                thinkingConfig: {
-                  thinkingBudget: 0
-                }
+                responseMimeType: 'application/json'
               }
             })
           }
@@ -125,8 +128,9 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
 
         if (!geminiResponse.ok) {
           const errText = await geminiResponse.text();
-          lastError = `${model} (${geminiResponse.status})`;
-          console.error('Gemini model failed:', lastError, errText.slice(0, 150));
+          const summaryErr = `${model} (${geminiResponse.status})`;
+          errors.push(summaryErr);
+          console.error('Gemini model failed:', summaryErr, errText.slice(0, 200));
           continue;
         }
 
@@ -140,14 +144,15 @@ Return ONLY valid JSON matching this schema (keep explanations concise, 1 senten
         }
       } catch (modelErr) {
         clearTimeout(timeoutId);
-        lastError = modelErr.name === 'AbortError' ? `${model} timed out` : `${model}: ${modelErr.message}`;
-        console.error('Gemini exception:', lastError);
+        const summaryErr = modelErr.name === 'AbortError' ? `${model} (timeout)` : `${model} (${modelErr.message})`;
+        errors.push(summaryErr);
+        console.error('Gemini exception:', summaryErr);
       }
     }
 
     if (!parsedResult || !Array.isArray(parsedResult.biomarkers)) {
       return res.status(502).json({
-        error: `AI service is temporarily busy (${lastError}). Please tap Select Lab PDF or Photo to try again.`
+        error: `AI service is temporarily busy (${errors.join(', ')}). Please tap Select Lab PDF or Photo to try again.`
       });
     }
 
