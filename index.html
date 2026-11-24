@@ -572,32 +572,60 @@
     <p class="mt-4 text-slate-400">&copy; 2026 TrueRange Labs (TrueRangeLabs.com). All rights reserved.</p>
   </footer>
 
-  <!-- Auth Modal (Sign Up / Log In) — z-[99999] keeps it above PayPal iframes -->
+  <!-- Auth Modal (Sign Up / Log In / Forgot Password / Recovery) — z-[99999] keeps it above PayPal iframes -->
   <div id="authModal" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
-      <h3 class="text-xl font-bold text-slate-900">Sign In or Create Free Account</h3>
-      <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your subscription.</p>
 
-      <form onsubmit="handleAuthSubmit(event)" class="mt-5 space-y-3.5">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-          <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Password (min 6 characters)</label>
-          <input type="password" id="authPassword" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
-        </div>
-        <p id="authFeedback" class="text-xs font-medium text-emerald-700"></p>
-        <div class="grid grid-cols-2 gap-3 pt-1">
-          <button type="submit" data-mode="login" onclick="window._authMode='login'" class="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition">
-            Log In
+      <!-- Standard Login / Sign Up Form -->
+      <div id="authLoginView">
+        <h3 class="text-xl font-bold text-slate-900">Sign In or Create Free Account</h3>
+        <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your subscription.</p>
+
+        <form onsubmit="handleAuthSubmit(event)" class="mt-5 space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+            <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Password (min 6 characters)</label>
+            <input type="password" id="authPassword" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+          </div>
+
+          <div class="flex justify-end">
+            <button type="button" onclick="handleForgotPassword()" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 underline underline-offset-2">
+              Forgot password?
+            </button>
+          </div>
+
+          <p id="authFeedback" class="text-xs font-medium text-emerald-700"></p>
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <button type="submit" data-mode="login" onclick="window._authMode='login'" class="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition">
+              Log In
+            </button>
+            <button type="submit" data-mode="signup" onclick="window._authMode='signup'" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
+              Sign Up Free
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Password Recovery Form (Shown when user clicks the reset link from email) -->
+      <div id="authRecoveryView" class="hidden">
+        <h3 class="text-xl font-bold text-slate-900">Set a New Password</h3>
+        <p class="text-sm text-slate-600 mt-1">Enter your new password below to regain access to your account.</p>
+
+        <form onsubmit="handlePasswordUpdate(event)" class="mt-5 space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">New Password (min 6 characters)</label>
+            <input type="password" id="newPasswordInput" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-600" />
+          </div>
+          <p id="recoveryFeedback" class="text-xs font-medium text-emerald-700"></p>
+          <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
+            Update Password
           </button>
-          <button type="submit" data-mode="signup" onclick="window._authMode='signup'" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
-            Sign Up Free
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -634,12 +662,75 @@
     }
     refreshSession();
 
+    // Listen for password recovery links coming back from Supabase email
+    sb.auth.onAuthStateChange((event, session) => {
+      currentSession = session;
+      if (event === 'PASSWORD_RECOVERY') {
+        document.getElementById('authLoginView').classList.add('hidden');
+        document.getElementById('authRecoveryView').classList.remove('hidden');
+        document.getElementById('recoveryFeedback').textContent = '';
+        document.getElementById('authModal').classList.remove('hidden');
+      } else {
+        refreshSession();
+      }
+    });
+
     function openAuthModal() {
+      document.getElementById('authLoginView').classList.remove('hidden');
+      document.getElementById('authRecoveryView').classList.add('hidden');
       document.getElementById('authFeedback').textContent = '';
       document.getElementById('authModal').classList.remove('hidden');
     }
     function closeAuthModal() {
       document.getElementById('authModal').classList.add('hidden');
+    }
+
+    async function handleForgotPassword() {
+      const email = document.getElementById('authEmail').value.trim();
+      const feedback = document.getElementById('authFeedback');
+
+      if (!email) {
+        feedback.className = 'text-xs font-medium text-amber-700';
+        feedback.textContent = 'Enter your email address above first, then click "Forgot password?".';
+        return;
+      }
+
+      feedback.className = 'text-xs font-medium text-slate-600';
+      feedback.textContent = 'Sending password reset link...';
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin
+      });
+
+      if (error) {
+        feedback.className = 'text-xs font-medium text-red-600';
+        feedback.textContent = error.message;
+      } else {
+        feedback.className = 'text-xs font-medium text-emerald-700';
+        feedback.textContent = `Password reset email sent to ${email}. Check your inbox (and spam folder).`;
+      }
+    }
+
+    async function handlePasswordUpdate(e) {
+      e.preventDefault();
+      const newPassword = document.getElementById('newPasswordInput').value;
+      const feedback = document.getElementById('recoveryFeedback');
+      feedback.className = 'text-xs font-medium text-slate-600';
+      feedback.textContent = 'Updating password...';
+
+      const { error } = await sb.auth.updateUser({ password: newPassword });
+      if (error) {
+        feedback.className = 'text-xs font-medium text-red-600';
+        feedback.textContent = error.message;
+      } else {
+        feedback.className = 'text-xs font-medium text-emerald-700';
+        feedback.textContent = 'Password updated! You are now logged in.';
+        await refreshSession();
+        setTimeout(() => {
+          document.getElementById('newPasswordInput').value = '';
+          closeAuthModal();
+        }, 900);
+      }
     }
 
     function selectCommercialPlan() {
