@@ -333,7 +333,7 @@
           </button>
         </div>
 
-        <!-- 2. TrueRange Pro ($19/mo — 40 personal reports/mo) -->
+        <!-- 2. TrueRange Pro ($19/mo — 15 personal reports/mo) -->
         <div class="bg-white rounded-2xl border-2 border-emerald-600 p-6 shadow-lg relative flex flex-col justify-between">
           <div class="absolute -top-3 right-5 bg-emerald-600 text-white text-[11px] font-bold px-3 py-0.5 rounded-full">
             Most Popular
@@ -346,7 +346,7 @@
             </div>
             <p class="mt-3 text-xs text-slate-600 leading-relaxed">For individuals tracking personal panels and immediate household health.</p>
             <ul class="mt-5 space-y-2 text-xs text-slate-700">
-              <li>✓ <strong>40 Personal Reports / Month</strong></li>
+              <li>✓ <strong>15 Personal Reports / Month</strong></li>
               <li>✓ Full Longevity &amp; Functional Range Targets</li>
               <li>✓ Printable Doctor Visit PDF Summaries</li>
               <li>✓ Cancel anytime in 1 click via PayPal</li>
@@ -354,7 +354,7 @@
           </div>
 
           <div class="mt-6">
-            <div class="max-w-[240px] mx-auto">
+            <div class="max-w-[240px] mx-auto relative z-0">
               <div id="paypal-button-container-P-67A60544K5870822LNL4VK5I"></div>
             </div>
             <p class="text-center text-[11px] text-slate-400 mt-1.5">Personal use • PayPal or Debit/Credit Card</p>
@@ -379,7 +379,7 @@
           </div>
 
           <div class="mt-6">
-            <div class="max-w-[240px] mx-auto">
+            <div class="max-w-[240px] mx-auto relative z-0">
               <div id="paypal-button-container-P-6X7146173Y739354RNMBYIZY"></div>
             </div>
             <p class="text-center text-[11px] text-slate-400 mt-1.5">Commercial license • Cancel anytime</p>
@@ -404,7 +404,7 @@
           </div>
 
           <div class="mt-6">
-            <div class="max-w-[240px] mx-auto">
+            <div class="max-w-[240px] mx-auto relative z-0">
               <div id="paypal-button-container-P-6GS168829G298301JNMBYNCQ"></div>
             </div>
             <p class="text-center text-xs sm:text-sm text-slate-200 mt-2.5">
@@ -415,7 +415,7 @@
       </div>
 
       <p class="text-center text-xs text-slate-500 mt-6">
-        Log in or create a free account first so your subscription unlocks automatically upon payment. TrueRange Pro ($19/mo) is licensed for individual personal use only (40-report/month Fair Use allowance).
+        Log in or create a free account first so your subscription unlocks automatically upon payment. TrueRange Pro ($19/mo) is licensed for individual personal use only (15-report/month Fair Use allowance).
       </p>
     </div>
   </section>
@@ -476,7 +476,7 @@
             <span class="ml-4 text-emerald-600 font-bold text-lg transition-transform group-open:rotate-45">+</span>
           </summary>
           <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-            Every free account includes 1 full AI lab analysis at zero cost. <strong>TrueRange Pro ($19 USD/month)</strong> includes up to <strong>40 personal reports per month</strong> for ongoing individual health tracking. Practitioners, coaches, and diagnostic organizations can choose <strong>Clinic ($299/mo for 150 reports)</strong> or <strong>Enterprise ($799/mo for 500 reports)</strong>—all with instant PayPal or Debit/Credit Card activation and 1-click cancellation.
+            Every free account includes 1 full AI lab analysis at zero cost. <strong>TrueRange Pro ($19 USD/month)</strong> includes up to <strong>15 personal reports per month</strong> for ongoing individual health tracking. Practitioners, coaches, and diagnostic organizations can choose <strong>Clinic ($299/mo for 150 reports)</strong> or <strong>Enterprise ($799/mo for 500 reports)</strong>—all with instant PayPal or Debit/Credit Card activation and 1-click cancellation.
           </p>
         </details>
       </div>
@@ -572,9 +572,9 @@
     <p class="mt-4 text-slate-400">&copy; 2026 TrueRange Labs (TrueRangeLabs.com). All rights reserved.</p>
   </footer>
 
-  <!-- Auth Modal (Sign Up / Log In) -->
-  <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-200 relative">
+  <!-- Auth Modal (Sign Up / Log In) — z-[99999] keeps it above PayPal iframes -->
+  <div id="authModal" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
       <h3 class="text-xl font-bold text-slate-900">Sign In or Create Free Account</h3>
       <p class="text-sm text-slate-600 mt-1">Create an account to run your free lab analysis or link your subscription.</p>
