@@ -10,7 +10,7 @@ export const config = {
 };
 
 const PLAN_LIMITS = {
-  pro: 40,
+  pro: 15,
   clinic: 150,
   enterprise: 500
 };
