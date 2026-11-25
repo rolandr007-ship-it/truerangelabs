@@ -77,15 +77,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Unrecognized PayPal plan ID: ${subData.plan_id}` });
     }
 
-    // 3. Unlock the paid tier in Supabase, store PayPal subscription ID, and reset 30-day cycle
+    // 3. Unlock the paid tier in Supabase and store PayPal subscription ID
     const nowIso = new Date().toISOString();
     const { error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({
         plan: assignedTier,
         paypal_subscription_id: subscriptionID,
-        monthly_reports_used: 0,
-        billing_cycle_start: nowIso,
         updated_at: nowIso
       })
       .eq('id', user.id);
