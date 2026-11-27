@@ -106,7 +106,6 @@ export default async function handler(req, res) {
           .from('profiles')
           .update({
             plan: 'free',
-            monthly_reports_used: 0,
             updated_at: new Date().toISOString()
           })
           .eq('paypal_subscription_id', subscriptionId)
@@ -124,7 +123,6 @@ export default async function handler(req, res) {
           .from('profiles')
           .update({
             plan: 'free',
-            monthly_reports_used: 0,
             updated_at: new Date().toISOString()
           })
           .ilike('email', subscriberEmail)
